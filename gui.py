@@ -9,6 +9,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 
+
 class Fastr(BoxLayout):
     def __init__(self, **kwargs):
         super(Fastr, self).__init__(**kwargs)
