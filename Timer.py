@@ -13,6 +13,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import Screen
 
 from datetime import datetime
+import datetime as dt
+import threading
 
 class Timer(Screen):
     def __init__(self, **kwargs):
@@ -36,6 +38,21 @@ class Timer(Screen):
         grid.add_widget(self.stats_button)
         grid.size_hint_y = 0.25
         layout.add_widget(grid)
+        # Timer Setup
+        user_data = App.get_running_app().user_data
+        # I'm sad that I can't think of a better way to do this
+        for date in user_data:
+            recent = date
+        try:
+            last_timestamp = user_data[recent]["timestamp"]
+        except:
+            last_timestamp = time.time()
+        current_seconds = time.time()
+        delta_time = current_seconds - last_timestamp
+        time_obj = dt.timedelta(seconds=delta_time)
+        self.fasting_time.text = self.format_delta_time(time_obj)
+        self.run_timer()
+        # Add Layout
         self.add_widget(layout)
 
     def on_button_click(self, button):
@@ -52,5 +69,9 @@ class Timer(Screen):
             case "Statistics":
                 self.manager.current = "statistics"
 
+    def format_delta_time(self, delta_time):
+        return "wip"
+
+
     def run_timer(self):
-        pass
+        threading.Timer(1.0, self.run_timer)

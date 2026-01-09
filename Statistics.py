@@ -19,6 +19,7 @@ from kivy.storage.jsonstore import JsonStore
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 from datetime import datetime
+import datetime as dt
 
 class Statistics(Screen):
     def __init__(self, **kwargs):
@@ -42,14 +43,16 @@ class Statistics(Screen):
         self.filter_button = Button(text="Filter", size_hint=(0.3, 0.1), on_release=self.dropdown.open, pos_hint={"right": 1, "top": 1})
         self.all_time = Button(text="All Time", size_hint_y=None, height=80)
         self.all_time.bind(on_release=self.on_button_click)
-        self.year = Button(text="Year", size_hint_y=None, height=80)
+        self.year = Button(text="Today", size_hint_y=None, height=80)
         self.year.bind(on_release=self.on_button_click)
-        self.month = Button(text="Month", size_hint_y=None, height=80)
+        self.month = Button(text="Last 7 Days", size_hint_y=None, height=80)
         self.month.bind(on_release=self.on_button_click)
-        self.week = Button(text="Week", size_hint_y=None, height=80)
+        self.week = Button(text="Last 30 Days", size_hint_y=None, height=80)
         self.week.bind(on_release=self.on_button_click)
-        self.day = Button(text="Day", size_hint_y=None, height=80)
+        self.day = Button(text="Last 90 Days", size_hint_y=None, height=80)
         self.day.bind(on_release=self.on_button_click)
+        self.day2 = Button(text="Last 6 Months", size_hint_y=None, height=80)
+        self.day2.bind(on_release=self.on_button_click)
         self.dropdown.add_widget(self.all_time)
         self.dropdown.add_widget(self.year)
         self.dropdown.add_widget(self.month)
@@ -57,6 +60,7 @@ class Statistics(Screen):
         self.dropdown.add_widget(self.day)
         self.add_widget(self.filter_button)
         self.add_widget(self.dropdown)
+        self.dropdown.dismiss()
         self.load_data()
 
     def on_button_click(self, button):
@@ -67,21 +71,44 @@ class Statistics(Screen):
             case "Statistics":
                 self.manager.current = "statistics"
             case "All Time":
-                pass
-            case "Year":
-                self.filter_time(year=1)
-            case "Month":
-                self.filter_time(month=1)
-            case "Week":
-                self.filter_time(day=7)
-            case "Day":
+                self.load_data()
+                self.dropdown.dismiss()
+            case "Today":
                 self.filter_time(day=1)
+            case "Last 7 Days":
+                self.filter_time(day=7)
+            case "Last 30 Days":
+                self.filter_time(day=30)
+            case "Last 90 Days":
+                self.filter_time(day=90)
+            case "Last 6 Months":
+                self.filter_time(day=182)
 
-    def filter_time(self, day=0, month=0, year=0):
+    def filter_time(self, day):
         self.dropdown.dismiss()
-
-
-
+        user_data = App.get_running_app().user_data
+        date_format = "%Y-%m-%d %H:%M:%S"
+        now = datetime.now()
+        total_text = ""
+        if day == 1:
+            time_period = now - dt.timedelta(days=1)
+        elif day == 7:
+            time_period = now - dt.timedelta(days=7)
+        elif day == 30:
+            time_period = now - dt.timedelta(days=30)
+        elif day == 90:
+            time_period = now - dt.timedelta(days=90)
+        elif day == 182:
+            time_period = now - dt.timedelta(days=182)
+        else:
+            print("idk brug")
+        for date in user_data:
+            date_obj = datetime.strptime(date[:19], date_format)
+            seconds_since_epoch = user_data[date]["timestamp"]
+            button_pressed = user_data[date]["button_pressed"]
+            if date_obj > time_period:
+                total_text += f"{self.get_readable_date(date)}: {button_pressed}\n"
+        self.log.text = total_text
 
     def load_data(self):
         user_data = App.get_running_app().user_data
@@ -132,6 +159,7 @@ class Statistics(Screen):
             if int(hour) < 10:
                 hour = hour[0]
         else:
+            hour = int(hour) // 12
             hour_modifier = "PM"
         minutes = date[14:16]
 
