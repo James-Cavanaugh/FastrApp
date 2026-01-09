@@ -11,6 +11,7 @@ from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import Screen
+from kivy.clock import Clock
 
 from datetime import datetime
 import datetime as dt
@@ -43,15 +44,12 @@ class Timer(Screen):
         # I'm sad that I can't think of a better way to do this
         for date in user_data:
             recent = date
-        try:
-            last_timestamp = user_data[recent]["timestamp"]
-        except:
-            last_timestamp = time.time()
-        current_seconds = time.time()
-        delta_time = current_seconds - last_timestamp
-        time_obj = dt.timedelta(seconds=delta_time)
-        self.fasting_time.text = self.format_delta_time(time_obj)
+        if user_data:
+            self.last_timestamp = user_data[recent]["timestamp"]
+        else:
+            self.last_timestamp = time.time()
         self.run_timer()
+        Clock.schedule_interval(self.run_timer, 1)
         # Add Layout
         self.add_widget(layout)
 
@@ -61,17 +59,24 @@ class Timer(Screen):
             case "Start Eating":
                 button.text = "Stop Eating"
                 App.get_running_app().user_data.put(str(datetime.now()), timestamp=time.time(), button_pressed=text)
+                self.last_timestamp = time.time()
             case "Stop Eating":
                 button.text = "Start Eating"
                 App.get_running_app().user_data.put(str(datetime.now()), timestamp=time.time(), button_pressed=text)
+                self.last_timestamp = time.time()
             case "Timer":
                 self.manager.current = "timer"
             case "Statistics":
                 self.manager.current = "statistics"
 
     def format_delta_time(self, delta_time):
-        return "wip"
+        hours, remainder = divmod(int(delta_time.seconds), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        hours += delta_time.days * 24
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
-    def run_timer(self):
-        threading.Timer(1.0, self.run_timer)
+    def run_timer(self, *args):
+        delta_time = time.time() - self.last_timestamp
+        time_obj = dt.timedelta(seconds=delta_time)
+        self.fasting_time.text = self.format_delta_time(time_obj)
