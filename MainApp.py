@@ -1,23 +1,10 @@
-# Import Hell
 import kivy
-import time
-
-from kivy.tools.gallery import screenshots_dir
-
-kivy.require("2.3.1")
-
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.uix.dropdown import DropDown
 from kivy.storage.jsonstore import JsonStore
 from kivy.uix.screenmanager import ScreenManager, Screen
-
 from Timer import Timer
 from Statistics import Statistics
+kivy.require("2.3.1")
 
 class MainApp(App):
     def __init__(self, **kwargs):

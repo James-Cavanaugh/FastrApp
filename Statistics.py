@@ -25,20 +25,25 @@ class Statistics(Screen):
     def __init__(self, **kwargs):
         super(Statistics, self).__init__(**kwargs)
         layout = BoxLayout(orientation="vertical")
+        # Log
         self.log = TextInput(readonly=True)
         layout.add_widget(self.log)
+        # Stats
+        self.stats = TextInput(readonly=True)
+        layout.add_widget(self.stats)
         # Screen Change Buttons
         self.timer_button = Button(text="Timer")
         self.timer_button.bind(on_release=self.on_button_click)
         self.stats_button = Button(text="Statistics")
         self.stats_button.bind(on_release=self.on_button_click)
+        # Grid Setup
         grid = GridLayout(cols=2)
         grid.add_widget(self.timer_button)
         grid.add_widget(self.stats_button)
         grid.size_hint_y = 0.25
         layout.add_widget(grid)
         self.add_widget(layout)
-        # Drop Down
+        # Drop Down Setup
         self.dropdown = DropDown()
         self.filter_button = Button(text="Filter", size_hint=(0.3, 0.1), on_release=self.dropdown.open, pos_hint={"right": 1, "top": 1})
         self.all_time = Button(text="All Time", size_hint_y=None, height=80)
@@ -58,8 +63,10 @@ class Statistics(Screen):
         self.dropdown.add_widget(self.month)
         self.dropdown.add_widget(self.week)
         self.dropdown.add_widget(self.day)
+        # Add Layouts
         self.add_widget(self.filter_button)
         self.add_widget(self.dropdown)
+        # Post-Screen Creation
         self.dropdown.dismiss()
         self.load_data()
 
@@ -84,7 +91,8 @@ class Statistics(Screen):
             case "Last 6 Months":
                 self.filter_time(day=182)
 
-    def filter_time(self, day):
+    def filter_time(self, day=0):
+        temp_user_data_keys = []
         self.dropdown.dismiss()
         user_data = App.get_running_app().user_data
         date_format = "%Y-%m-%d %H:%M:%S"
@@ -101,25 +109,25 @@ class Statistics(Screen):
         elif day == 182:
             time_period = now - dt.timedelta(days=182)
         else:
-            print("idk brug")
+            time_period = now - dt.timedelta(days=9999)
         for date in user_data:
             date_obj = datetime.strptime(date[:19], date_format)
             seconds_since_epoch = user_data[date]["timestamp"]
             button_pressed = user_data[date]["button_pressed"]
             if date_obj > time_period:
+                temp_user_data_keys.append(date)
                 total_text += f"{self.get_readable_date(date)}: {button_pressed}\n"
         self.log.text = total_text
+        return temp_user_data_keys
 
     def load_data(self):
-        user_data = App.get_running_app().user_data
-        total_text = ""
-        for date in user_data:
-            seconds_since_epoch = user_data[date]["timestamp"]
-            button_pressed = user_data[date]["button_pressed"]
-            total_text += f"{self.get_readable_date(date)}: {button_pressed}\n"
-        self.log.text = total_text
+        user_data_keys = self.filter_time()
+        self.load_stats(user_data_keys)
 
-    def get_readable_date(self, date):
+    def load_stats(self, data_keys: list[str]):
+        print(data_keys)
+
+    def get_readable_date(self, date: str) -> str:
         raw_month = date[5:7]
         month = "Didn't Assign"
         match raw_month:
@@ -159,9 +167,7 @@ class Statistics(Screen):
             if int(hour) < 10:
                 hour = hour[0]
         else:
-            hour = int(hour) // 12
+            hour = int(hour) - 12
             hour_modifier = "PM"
         minutes = date[14:16]
-
-
         return f"{month} {day}, {year} at {hour}:{minutes} {hour_modifier}"

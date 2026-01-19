@@ -1,21 +1,15 @@
-# Import Hell
 import kivy
 import time
-
-kivy.require("2.3.1")
-
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
-from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import Screen
 from kivy.clock import Clock
-
 from datetime import datetime
 import datetime as dt
-import threading
+kivy.require("2.3.1")
 
 class Timer(Screen):
     def __init__(self, **kwargs):
@@ -34,6 +28,7 @@ class Timer(Screen):
         self.timer_button.bind(on_release=self.on_button_click)
         self.stats_button = Button(text="Statistics")
         self.stats_button.bind(on_release=self.on_button_click)
+        # Grid Setup
         grid = GridLayout(cols=2)
         grid.add_widget(self.timer_button)
         grid.add_widget(self.stats_button)
@@ -41,15 +36,14 @@ class Timer(Screen):
         layout.add_widget(grid)
         # Timer Setup
         user_data = App.get_running_app().user_data
-        # I'm sad that I can't think of a better way to do this
-        for date in user_data:
-            recent = date
+        # Get Last Entry in user_data
         if user_data:
-            self.last_timestamp = user_data[recent]["timestamp"]
+            for date in user_data:
+                self.last_timestamp = user_data[date]["timestamp"]
         else:
             self.last_timestamp = time.time()
-        self.run_timer()
-        Clock.schedule_interval(self.run_timer, 1)
+        self.update_timer()
+        Clock.schedule_interval(self.update_timer, 1)
         # Add Layout
         self.add_widget(layout)
 
@@ -60,23 +54,25 @@ class Timer(Screen):
                 button.text = "Stop Eating"
                 App.get_running_app().user_data.put(str(datetime.now()), timestamp=time.time(), button_pressed=text)
                 self.last_timestamp = time.time()
+                self.manager.get_screen("statistics").load_data()
             case "Stop Eating":
                 button.text = "Start Eating"
                 App.get_running_app().user_data.put(str(datetime.now()), timestamp=time.time(), button_pressed=text)
                 self.last_timestamp = time.time()
+                self.manager.get_screen("statistics").load_data()
             case "Timer":
                 self.manager.current = "timer"
             case "Statistics":
                 self.manager.current = "statistics"
 
-    def format_delta_time(self, delta_time):
+    def format_delta_time(self, delta_time: dt.timedelta):
         hours, remainder = divmod(int(delta_time.seconds), 3600)
         minutes, seconds = divmod(remainder, 60)
         hours += delta_time.days * 24
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
-    def run_timer(self, *args):
+    def update_timer(self, *args):
         delta_time = time.time() - self.last_timestamp
         time_obj = dt.timedelta(seconds=delta_time)
         self.fasting_time.text = self.format_delta_time(time_obj)
