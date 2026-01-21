@@ -11,6 +11,8 @@ from datetime import datetime
 import datetime as dt
 kivy.require("2.3.1")
 
+from App_Module import format_delta_time
+
 class Timer(Screen):
     def __init__(self, **kwargs):
         # Setup
@@ -65,14 +67,8 @@ class Timer(Screen):
             case "Statistics":
                 self.manager.current = "statistics"
 
-    def format_delta_time(self, delta_time: dt.timedelta):
-        hours, remainder = divmod(int(delta_time.seconds), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        hours += delta_time.days * 24
-        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-
 
     def update_timer(self, *args):
         delta_time = time.time() - self.last_timestamp
         time_obj = dt.timedelta(seconds=delta_time)
-        self.fasting_time.text = self.format_delta_time(time_obj)
+        self.fasting_time.text = format_delta_time(time_obj)

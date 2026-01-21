@@ -17,9 +17,9 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.dropdown import DropDown
 from kivy.storage.jsonstore import JsonStore
 from kivy.uix.screenmanager import ScreenManager, Screen
-
 from datetime import datetime
 import datetime as dt
+from App_Module import get_readable_date
 
 class Statistics(Screen):
     def __init__(self, **kwargs):
@@ -116,7 +116,7 @@ class Statistics(Screen):
             button_pressed = user_data[date]["button_pressed"]
             if date_obj > time_period:
                 temp_user_data_keys.append(date)
-                total_text += f"{self.get_readable_date(date)}: {button_pressed}\n"
+                total_text += f"{get_readable_date(date)}: {button_pressed}\n"
         self.log.text = total_text
         return temp_user_data_keys
 
@@ -126,48 +126,3 @@ class Statistics(Screen):
 
     def load_stats(self, data_keys: list[str]):
         print(data_keys)
-
-    def get_readable_date(self, date: str) -> str:
-        raw_month = date[5:7]
-        month = "Didn't Assign"
-        match raw_month:
-            case "01":
-                month = "January"
-            case "02":
-                month = "February"
-            case "03":
-                month = "March"
-            case "04":
-                month = "April"
-            case "05":
-                month = "May"
-            case "06":
-                month = "June"
-            case "07":
-                month = "July"
-            case "08":
-                month = "August"
-            case "09":
-                month = "September"
-            case "10":
-                month = "October"
-            case "11":
-                month = "November"
-            case "12":
-                month = "December"
-            case _:
-                month = "Error"
-        day = date[8:10]
-        if day[0] == "0":
-            day = day[1]
-        year = date[0:4]
-        hour = date[11:13]
-        if int(hour) < 12:
-            hour_modifier = "AM"
-            if int(hour) < 10:
-                hour = hour[0]
-        else:
-            hour = int(hour) - 12
-            hour_modifier = "PM"
-        minutes = date[14:16]
-        return f"{month} {day}, {year} at {hour}:{minutes} {hour_modifier}"
