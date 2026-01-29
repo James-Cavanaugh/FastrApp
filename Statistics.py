@@ -1,21 +1,12 @@
 # Import Hell
-from unittest import case
-
 import kivy
-import time
-
-from kivy.tools.gallery import screenshots_dir
-
 kivy.require("2.3.1")
-
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.dropdown import DropDown
-from kivy.storage.jsonstore import JsonStore
 from kivy.uix.screenmanager import ScreenManager, Screen
 from datetime import datetime
 import datetime as dt
@@ -81,17 +72,17 @@ class Statistics(Screen):
                 self.load_data()
                 self.dropdown.dismiss()
             case "Today":
-                self.filter_time(day=1)
+                self.load_data(1)
             case "Last 7 Days":
-                self.filter_time(day=7)
+                self.load_data(7)
             case "Last 30 Days":
-                self.filter_time(day=30)
+                self.load_data(30)
             case "Last 90 Days":
-                self.filter_time(day=90)
+                self.load_data(90)
             case "Last 6 Months":
-                self.filter_time(day=182)
+                self.load_data(182)
 
-    def filter_time(self, day=0):
+    def filter_time(self, day):
         temp_user_data_keys = []
         self.dropdown.dismiss()
         user_data = App.get_running_app().user_data
@@ -115,13 +106,13 @@ class Statistics(Screen):
             seconds_since_epoch = user_data[date]["timestamp"]
             button_pressed = user_data[date]["button_pressed"]
             if date_obj > time_period:
-                temp_user_data_keys.append(date)
+                temp_user_data_keys.append(date_obj)
                 total_text += f"{get_readable_date(date)}: {button_pressed}\n"
         self.log.text = total_text
         return temp_user_data_keys
 
-    def load_data(self):
-        user_data_keys = self.filter_time()
+    def load_data(self, day=0):
+        user_data_keys = self.filter_time(day)
         self.load_stats(user_data_keys)
 
     def load_stats(self, data_keys: list[str]):

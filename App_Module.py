@@ -1,7 +1,5 @@
 import datetime as dt
 
-
-
 def format_delta_time(delta_time: dt.timedelta):
     hours, remainder = divmod(int(delta_time.seconds), 3600)
     minutes, seconds = divmod(remainder, 60)
@@ -10,7 +8,6 @@ def format_delta_time(delta_time: dt.timedelta):
 
 def get_readable_date(date: str) -> str:
     raw_month = date[5:7]
-    month = "Didn't Assign"
     match raw_month:
         case "01":
             month = "January"
@@ -47,6 +44,8 @@ def get_readable_date(date: str) -> str:
         hour_modifier = "AM"
         if int(hour) < 10:
             hour = hour[0]
+    elif int(hour) < 13:
+        hour_modifier = "PM"
     else:
         hour = int(hour) - 12
         hour_modifier = "PM"

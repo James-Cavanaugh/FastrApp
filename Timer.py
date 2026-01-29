@@ -50,16 +50,15 @@ class Timer(Screen):
         self.add_widget(layout)
 
     def on_button_click(self, button):
-        text = button.text
-        match text:
+        match button.text:
             case "Start Eating":
                 button.text = "Stop Eating"
-                App.get_running_app().user_data.put(str(datetime.now()), timestamp=time.time(), button_pressed=text)
+                App.get_running_app().user_data.put(str(datetime.now()), timestamp=time.time(), button_pressed=button.text)
                 self.last_timestamp = time.time()
                 self.manager.get_screen("statistics").load_data()
             case "Stop Eating":
                 button.text = "Start Eating"
-                App.get_running_app().user_data.put(str(datetime.now()), timestamp=time.time(), button_pressed=text)
+                App.get_running_app().user_data.put(str(datetime.now()), timestamp=time.time(), button_pressed=button.text)
                 self.last_timestamp = time.time()
                 self.manager.get_screen("statistics").load_data()
             case "Timer":
