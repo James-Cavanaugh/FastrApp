@@ -11,6 +11,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from datetime import datetime
 import datetime as dt
 from App_Module import get_readable_date
+from App_Module import calculate_stats
 
 class Statistics(Screen):
     def __init__(self, **kwargs):
@@ -116,4 +117,6 @@ class Statistics(Screen):
         self.load_stats(user_data_keys)
 
     def load_stats(self, data_keys: list[str]):
-        print(data_keys)
+        stats = calculate_stats(data_keys)
+        print(stats)
+

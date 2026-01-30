@@ -51,3 +51,25 @@ def get_readable_date(date: str) -> str:
         hour_modifier = "PM"
     minutes = date[14:16]
     return f"{month} {day}, {year} at {hour}:{minutes} {hour_modifier}"
+
+def calculate_stats(data_keys: list[str]):
+    print(data_keys)
+    last_key = None
+    min_time = dt.timedelta()
+    max_time = dt.timedelta()
+    avg_time = dt.timedelta()
+    for key in data_keys:
+        if last_key:
+            timeperiod = key - last_key
+            avg_time += timeperiod
+            last_key = key
+            if timeperiod > max_time:
+                max_time = timeperiod
+            if timeperiod < min_time:
+                min_time = timeperiod
+        else:
+            last_key = key
+    avg_time = avg_time / len(data_keys)
+    return {"MIN": min_time,
+            "MAX": max_time,
+            "AVG": avg_time,}
