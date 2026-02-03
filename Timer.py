@@ -19,16 +19,16 @@ class Timer(Screen):
         super(Timer, self).__init__(**kwargs)
         layout = BoxLayout(orientation="vertical")
         # Fasting Text Input
-        self.fasting_time = TextInput(multiline=False, readonly=True)
+        self.fasting_time = TextInput(multiline=False, readonly=True, font_size=100)
         layout.add_widget(self.fasting_time)
         # Button
-        self.fasting_button = Button(text="Start Eating")
+        self.fasting_button = Button(text="Start Eating", font_size=60)
         self.fasting_button.bind(on_release=self.on_button_click)
         layout.add_widget(self.fasting_button)
         # Screen Change Buttons
-        self.timer_button = Button(text="Timer")
+        self.timer_button = Button(text="Timer", font_size=60)
         self.timer_button.bind(on_release=self.on_button_click)
-        self.stats_button = Button(text="Statistics")
+        self.stats_button = Button(text="Statistics", font_size=60)
         self.stats_button.bind(on_release=self.on_button_click)
         # Grid Setup
         grid = GridLayout(cols=2)

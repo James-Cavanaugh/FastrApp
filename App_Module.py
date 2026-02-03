@@ -1,4 +1,5 @@
 import datetime as dt
+from kivy.app import App
 
 def format_delta_time(delta_time: dt.timedelta):
     hours, remainder = divmod(int(delta_time.seconds), 3600)
